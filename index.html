@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Softphone MVP</title>
+    <script type="text/javascript" src="https://static.twilio.com/libs/twiliojs/1.1/twilio.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript">
+      $().ready(function() {
+        // get the twilio client token
+        jQuery.ajax({
+          url: "https://softphone-mvp.herokuapp.com/token",
+          dataType: "json",
+          data: {
+            auth: "f7701bcb704a6cef2673421fc0b616b6f15f87947ace78d00802a215ac32c1d88ad72afe3b81b3d88fc034c0eb4474188ed11426c880804f36d520066eb4e91c"
+          },
+          success: function( data ) {
+            Twilio.Device.setup(data.token, {debug:true});
+          }
+        });
+
+        Twilio.Device.ready(function (device) {
+          $("#twilio-log").text("Ready");
+        });
+
+        Twilio.Device.error(function (error) {
+          $("#twilio-log").text("Error: " + error.message);
+        });
+
+        Twilio.Device.connect(function (conn) {
+          $("#twilio-log").text("Successfully established call");
+        });
+
+        Twilio.Device.disconnect(function (conn) {
+          $("#twilio-log").text("Call ended");
+        });
+
+        Twilio.Device.incoming(function (conn) {
+          $("#twilio-log").text("Incoming connection from " + conn.parameters.From);
+          // accept the incoming connection and start two-way audio
+          conn.accept();
+        });
+
+        $('#twilio-call').click(function() {
+          params = {"PhoneNumber": $("#twilio-outbound-number").val()};
+          Twilio.Device.connect(params);
+        });
+
+        $('#twilio-hangup').click(function() {
+          Twilio.Device.disconnectAll();
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <input type="text" id="twilio-outbound-number" placeholder="Enter a phone number to call"/>
+    <button id="twilio-call">Call</button>
+    <button id="twilio-hangup">Hangup</button>
+    <div id="twilio-log"></div>
+  </body>
+</html>
