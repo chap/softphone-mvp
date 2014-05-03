@@ -3,6 +3,10 @@ require 'twilio-ruby'
 require 'json'
 require 'newrelic_rpm'
 
+get '/' do
+  send_file 'index.html'
+end
+
 get '/token' do
   content_type :json
   response.headers['Access-Control-Allow-Origin'] = '*'
