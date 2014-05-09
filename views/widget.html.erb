@@ -26,7 +26,7 @@
     color: white;
   }
 </style>
-<div id="softphone" style="display:none;">
+<div id="softphone" data-twilio-token="<%= @token %>" style="display:none;">
   <a href="#" class=""><img src="//<%= request.host_with_port %>/images/phone.png" width="24" height="24"></a>
   <input type="text" id="outbound-number" placeholder="enter a phone number"/>
   <button id="call">Call</button>
