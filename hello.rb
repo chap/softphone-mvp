@@ -2,24 +2,35 @@ require 'sinatra'
 require 'twilio-ruby'
 require 'json'
 require 'newrelic_rpm'
+require 'coffee-script'
 
-get '/' do
-  send_file 'index.html'
-end
+require './env' if File.exists?('env.rb')
 
-get '/token' do
-  content_type :json
+get '/widget.js' do
   response.headers['Access-Control-Allow-Origin'] = '*'
-
-  if request.secure? && params[:auth] == ENV['AUTH_PARAM']
+  if ((request.secure? || ENV['RACK_ENV'] == 'development') && params[:auth] == ENV['AUTH_PARAM'])
     capability = Twilio::Util::Capability.new ENV['TWILIO_SID'], ENV['TWILIO_AUTH_TOKEN']
     capability.allow_client_outgoing ENV['TWILIO_OUTGOING_APP_ID']
     capability.allow_client_incoming ENV['TWILIO_CLIENT_ID']
-    token = capability.generate
+    @token = capability.generate
 
-    { :token => token }.to_json
+    coffee(erb 'widget.js.coffee'.to_sym)
   else
     { :error => 'bad request' }.to_json
+  end
+end
+
+post '/widget.html' do
+  response.headers['Access-Control-Allow-Origin'] = '*'
+  if ((request.secure? || ENV['RACK_ENV'] == 'development') && params[:auth] == ENV['AUTH_PARAM'])
+    capability = Twilio::Util::Capability.new ENV['TWILIO_SID'], ENV['TWILIO_AUTH_TOKEN']
+    capability.allow_client_outgoing params[:outgoing_app_id]
+    capability.allow_client_incoming params[:client_id]
+    @token = capability.generate
+
+    erb('widget.html'.to_sym, :layout => false)
+  else
+    "<div>Error: bad request (must be SSL and include auth param)</div>"
   end
 end
 

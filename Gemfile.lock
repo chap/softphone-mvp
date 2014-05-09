@@ -2,6 +2,11 @@ GEM
   remote: https://rubygems.org/
   specs:
     builder (3.1.4)
+    coffee-script (2.2.0)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.7.0)
+    execjs (2.0.2)
     json (1.8.1)
     jwt (0.1.8)
       multi_json (>= 1.5)
@@ -24,6 +29,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  coffee-script
   json
   newrelic_rpm
   sinatra

@@ -1,0 +1,35 @@
+<style type="text/css" media="screen">
+  #softphone {
+    background: #5881a8;
+    height: 52px;
+    padding: 10px;
+    width: 285px;
+    position: absolute;
+    bottom:0;
+    right: -261px;
+    box-sizing: content-box;
+
+    font-family: Arial, Garuda, sans-serif;
+    font-size: 12px;
+  }
+  #softphone a {
+    display: block;
+    float: left;
+    padding-top: 15px;
+    padding-right: 10px;
+  }
+  #softphone #outbound-number {
+    padding: 5px;
+    width: 135px;
+  }
+  #softphone #log {
+    color: white;
+  }
+</style>
+<div id="softphone" style="display:none;">
+  <a href="#" class=""><img src="//<%= request.host_with_port %>/images/phone.png" width="24" height="24"></a>
+  <input type="text" id="outbound-number" placeholder="enter a phone number"/>
+  <button id="call">Call</button>
+  <button id="hangup">Hangup</button>
+  <div id="log">initializing</div>
+</div>

@@ -1,0 +1,55 @@
+# get twilio token && widget css
+$.ajax({
+  url: '//<%= request.host_with_port %>/widget.html',
+  type: 'POST',
+  data: window.softphone_options,
+  dataType: "html",
+  success: (data) ->
+    $('body').append(data)
+    $('#softphone').fadeIn()
+});
+
+# get twilio js and intitalize widget
+$.getScript("//static.twilio.com/libs/twiliojs/1.1/twilio.min.js", ->
+  Twilio.Device.setup('<%= @token %>', {debug:window.softphone_options.debug_twilio})
+
+  Twilio.Device.ready((device) ->
+    $("#softphone #log").text("ready")
+  )
+
+  Twilio.Device.error((error) ->
+    $("#softphone #log").text("error: " + error.message)
+  )
+
+  Twilio.Device.connect((conn) ->
+    $("#softphone #log").text("successfully established call")
+  )
+
+  Twilio.Device.disconnect((conn) ->
+    $("#softphone #log").text("call ended")
+  )
+
+  Twilio.Device.incoming((conn) ->
+    $("#softphone #log").text("incoming from " + conn.parameters.From)
+    #accept the incoming connection and start two-way audio
+    conn.accept()
+  );
+
+  jQuery('#softphone #call').click(->
+    connect_params = {"PhoneNumber": $("#softphone #outbound-number").val()}
+    Twilio.Device.connect(connect_params)
+  )
+
+  jQuery('#softphone #hangup').click(->
+    Twilio.Device.disconnectAll()
+  )
+
+  $('#softphone a').toggle(
+    ->
+      $('#softphone').animate({right:'0px'}, 100, ->
+        $('#softphone #outbound-number').focus()
+      )
+    , ->
+      $('#softphone').animate({right:'-400px'}, 100)
+  )
+)
