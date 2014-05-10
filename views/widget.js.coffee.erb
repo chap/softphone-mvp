@@ -1,47 +1,48 @@
 # get twilio html (includes token)
-$.ajax
+jQuery.ajax
   url: '//<%= request.host_with_port %>/widget.html',
   type: 'POST',
   data: window.softphone_options,
   dataType: "html",
+  global: false,
   success: (data) ->
-    $('body').append(data)
-    $('#softphone').fadeIn()
+    jQuery('body').append(data)
+    jQuery('#softphone').fadeIn()
 
     # get twilio js and intitalize widget
-    $.getScript "//static.twilio.com/libs/twiliojs/1.1/twilio.min.js", ->
-      token = $('#softphone').attr('data-twilio-token')
+    jQuery.getScript "//static.twilio.com/libs/twiliojs/1.1/twilio.min.js", ->
+      token = jQuery('#softphone').attr('data-twilio-token')
       Twilio.Device.setup(token, { debug:window.softphone_options.debug_twilio })
 
       Twilio.Device.ready (device) ->
-        $("#softphone #log").text("ready")
+        jQuery("#softphone #log").text("ready")
 
       Twilio.Device.error (error) ->
-        $("#softphone #log").text("error: " + error.message)
+        jQuery("#softphone #log").text("error: " + error.message)
 
       Twilio.Device.connect (conn) ->
-        $("#softphone #log").text("successfully established call")
+        jQuery("#softphone #log").text("successfully established call")
 
       Twilio.Device.disconnect (conn) ->
-        $("#softphone #log").text("call ended")
+        jQuery("#softphone #log").text("call ended")
 
       Twilio.Device.incoming (conn) ->
-        $("#softphone #log").text("incoming from " + conn.parameters.From)
+        jQuery("#softphone #log").text("incoming from " + conn.parameters.From)
         #accept the incoming connection and start two-way audio
         conn.accept()
 
-      $('#softphone #call').click ->
-        connect_params = {"PhoneNumber": $("#softphone #outbound-number").val()}
+      jQuery('#softphone #call').click ->
+        connect_params = {"PhoneNumber": jQuery("#softphone #outbound-number").val()}
         Twilio.Device.connect(connect_params)
 
-      $('#softphone #hangup').click ->
+      jQuery('#softphone #hangup').click ->
         Twilio.Device.disconnectAll()
 
-      $('#softphone a').toggle(
+      jQuery('#softphone a').toggle(
         ->
-          $('#softphone').animate({right:'0px'}, 100, ->
-            $('#softphone #outbound-number').focus()
+          jQuery('#softphone').animate({right:'0px'}, 100, ->
+            jQuery('#softphone #outbound-number').focus()
           )
         , ->
-          $('#softphone').animate({right:'-261px'}, 100)
+          jQuery('#softphone').animate({right:'-266px'}, 100)
       )
