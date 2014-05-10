@@ -46,3 +46,14 @@ jQuery.ajax
         , ->
           jQuery('#softphone').animate({right:'-266px'}, 100)
       )
+
+      # link all phone numbers
+      if window.softphone_options.number_regex
+        number_regex = new RegExp window.softphone_options.number_regex, 'g'
+        jQuery('#customerSummary').html(
+          jQuery('#customerSummary').html().replace(
+            number_regex,
+            '<a href="#" class="softphone">$1</a>'
+          )
+        )
+
