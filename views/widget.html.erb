@@ -1,25 +1,52 @@
 <style type="text/css" media="screen">
-  #softphone {
-    background: #5881a8;
-    height: 52px;
-    padding: 10px;
-    width: 290px;
-    position: absolute;
-    bottom:0;
-    right: -266px;
+  #softphone-outer-container {
+    overflow: hidden;
+    position: fixed;
+    top:0;
+    right:0;
+    height: 72px;
+    width: 330px;
     box-sizing: content-box;
-
-    font-family: Arial, Garuda, sans-serif;
-    font-size: 12px;
   }
-  #softphone a {
+  #softphone {
+    height: 72px;
+    width: 330px;
+    position: fixed;
+    top: 0;
+    right: -280px;
+    font: 12px/1.7em Arial, Garuda, sans-serif;
+
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.25)
+  }
+  #inputs-container {
+    background: #7ea3ae;
+    float: left;
+    padding: 10px;
+    padding-left: 0;
+    width: 270px;
+    height: 52px;
+  }
+  #softphone a.tab {
+    background-color: #7ea3ae;
+    background-image: url('//<%= request.host_with_port %>/images/phone.png');
+    background-position: center;
+    background-size: 40%;
+    background-repeat: no-repeat;
     display: block;
     float: left;
-    padding-top: 15px;
-    padding-right: 10px;
+    height: 72px;
+    width: 50px;
+    opacity: 0.75;
+  }
+  #softphone a.tab:hover, #softphone.active a.tab {
+    opacity:  1.0;
+  }
+  #softphone.active a.tab:hover {
+    opacity:  0.75;
   }
   #softphone #outbound-number {
     margin: 0;
+    margin-bottom: 5px;
     padding: 5px;
     width: 135px;
   }
@@ -27,10 +54,14 @@
     color: white;
   }
 </style>
-<div id="softphone" data-twilio-token="<%= @token %>" style="display:none;">
-  <a href="#" class=""><img src="//<%= request.host_with_port %>/images/phone.png" width="24" height="24"></a>
-  <input type="text" id="outbound-number" placeholder="enter a phone number"/>
-  <button id="call">Call</button>
-  <button id="hangup">Hangup</button>
-  <div id="log">initializing</div>
+<div id="softphone-outer-container">
+  <div id="softphone" data-twilio-token="<%= @token %>" style="display:none;">
+    <a href="#" class="tab"></a>
+    <div id="inputs-container">
+      <input type="text" id="outbound-number" placeholder="enter a phone number"/>
+      <button id="call">Call</button>
+      <button id="hangup">Hangup</button>
+      <div id="log">initializing</div>
+    </div>
+  </div>
 </div>

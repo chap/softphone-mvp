@@ -6,7 +6,7 @@ jQuery.ajax
   dataType: "html",
   global: false,
   success: (data) ->
-    jQuery('body').append(data)
+    jQuery('body').prepend(data)
     jQuery('#softphone').fadeIn()
 
     # get twilio js and intitalize widget
@@ -40,12 +40,18 @@ jQuery.ajax
 
       jQuery('#softphone a').toggle(
         ->
-          jQuery('#softphone').animate({right:'0px'}, 100, ->
+          toggleWidget(true)
+        , ->
+          toggleWidget(false)
+      )
+
+      toggleWidget = (direction) ->
+        if direction
+          jQuery('#softphone').addClass('active').animate({right:'0px'}, 100, ->
             jQuery('#softphone #outbound-number').focus()
           )
-        , ->
-          jQuery('#softphone').animate({right:'-266px'}, 100)
-      )
+        else
+          jQuery('#softphone').removeClass('active').animate({right:'-280px'}, 100)
 
       # link all phone numbers
       if window.softphone_options.number_regex
@@ -57,3 +63,6 @@ jQuery.ajax
           )
         )
 
+        jQuery('a.softphone').click ->
+          toggleWidget(true)
+          jQuery('#softphone #outbound-number').val jQuery(this).text()
