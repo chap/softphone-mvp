@@ -26,17 +26,14 @@ post '/widget.html' do
 end
 
 post '/voice' do
-  number = params[:PhoneNumber]
+  inbound   = (params[:direction] == 'inbound')
+  to        = CGI::escapeHTML(params[:To] || ENV['TWILIO_CLIENT_ID'])
+  to_number = (/^[\d\+\-\(\) ]+$/.match(to))
+  from      = (inbound ? params[:From] : ENV['OUTGOING_NUMBER'])
+
   response = Twilio::TwiML::Response.new do |r|
-    r.Dial :callerId => ENV['OUTGOING_NUMBER'] do |d|
-      # Test to see if the PhoneNumber is a number, or a Client ID.
-      if /^[\d\+\-\(\) ]+$/.match(number)
-        # outbound call
-        d.Number(CGI::escapeHTML number)
-      else
-        # inbound call
-        d.Client ENV['TWILIO_CLIENT_ID']
-      end
+    r.Dial :callerId => from do |d|
+      to_number ? d.Number : d.Client
     end
   end
   response.text
