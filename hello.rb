@@ -27,13 +27,14 @@ end
 
 post '/voice' do
   inbound   = (params[:Direction] == 'inbound')
-  to        = CGI::escapeHTML(params[:To] || ENV['TWILIO_CLIENT_ID'])
+  to        = CGI::escapeHTML(params[:To])
+  to        = ENV['TWILIO_CLIENT_ID'] if to == ENV['INBOUND_NUMBER']
   to_number = (/^[\d\+\-\(\) ]+$/.match(to))
   from      = (inbound ? params[:From] : ENV['OUTGOING_NUMBER'])
 
   response = Twilio::TwiML::Response.new do |r|
     r.Dial :callerId => from do |d|
-      to_number ? d.Number : d.Client
+      to_number ? d.Number(to) : d.Client(to)
     end
   end
   response.text
