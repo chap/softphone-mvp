@@ -13,6 +13,7 @@ end
 
 post '/widget.html' do
   response.headers['Access-Control-Allow-Origin'] = '*'
+  logger.debug "params=#{params}"
   if ((request.secure? || ENV['RACK_ENV'] == 'development') && params[:auth] == ENV['AUTH_PARAM'])
     capability = Twilio::Util::Capability.new ENV['TWILIO_SID'], ENV['TWILIO_AUTH_TOKEN']
     capability.allow_client_outgoing params[:outgoing_app_id]
@@ -26,15 +27,14 @@ post '/widget.html' do
 end
 
 post '/voice' do
-  inbound   = (params[:Direction] == 'inbound')
-  to        = CGI::escapeHTML(params[:To])
-  to        = ENV['TWILIO_CLIENT_ID'] if to == ENV['INBOUND_NUMBER']
-  to_number = (/^[\d\+\-\(\) ]+$/.match(to))
-  from      = (inbound ? params[:From] : ENV['OUTGOING_NUMBER'])
+  to    = CGI::escapeHTML(params[:To])
+  to    = "client:#{ENV['TWILIO_CLIENT_ID']}" if to == ENV['INBOUND_NUMBER']
+  from  = params[:From]
+  from  = ENV['OUTGOING_NUMBER']              if from.include?('client')
 
   response = Twilio::TwiML::Response.new do |r|
     r.Dial :callerId => from do |d|
-      to_number ? d.Number(to) : d.Client(to)
+      to.include?('client') ? d.Client(to.gsub('client:','')) : d.Number(to)
     end
   end
   response.text

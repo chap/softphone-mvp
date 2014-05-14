@@ -1,6 +1,6 @@
 # get twilio html (includes token)
 jQuery.ajax
-  url: '//<%= request.host_with_port %>/widget.html',
+  url: 'http<%= 's' unless ENV['RACK_ENV'] == 'development' %>://<%= request.host_with_port %>/widget.html',
   type: 'POST',
   data: window.softphone_options,
   dataType: "html",
@@ -23,7 +23,6 @@ jQuery.ajax
       Twilio.Device.connect (conn) ->
         jQuery("#softphone #log").text("successfully established call")
         toggleConnected(true)
-        console.log('Twilio.Device.connect')
 
       Twilio.Device.disconnect (conn) ->
         jQuery("#softphone #log").text("call ended")
@@ -69,16 +68,14 @@ jQuery.ajax
           jQuery('#softphone #call').removeAttr("disabled")
           jQuery('#softphone #hangup').attr("disabled", true)
 
-      # link all phone numbers
-      if window.softphone_options.number_regex
-        number_regex = new RegExp window.softphone_options.number_regex, 'g'
-        jQuery('#customerSummary').html(
-          jQuery('#customerSummary').html().replace(
-            number_regex,
-            '<a href="#" class="softphone">$1</a>'
+      # link phone numbers
+      if window.softphone_options.number_selectors
+        jQuery(window.softphone_options.number_selectors).each (i,e) ->
+          jQuery(e).replaceWith(
+            "<a href='#' class='softphone'>" + jQuery(e).text() + "</a>"
           )
-        )
 
-        jQuery('a.softphone').click ->
-          toggleWidget(true)
-          jQuery('#softphone #outbound-number').val jQuery(this).text()
+      jQuery('a.softphone').click (e) ->
+        e.preventDefault()
+        toggleWidget(true)
+        jQuery('#softphone #outbound-number').val jQuery(this).text()
