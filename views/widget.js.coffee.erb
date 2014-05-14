@@ -12,7 +12,7 @@ jQuery.ajax
     # get twilio js and intitalize widget
     jQuery.getScript "//static.twilio.com/libs/twiliojs/1.1/twilio.min.js", ->
       token = jQuery('#softphone').attr('data-twilio-token')
-      Twilio.Device.setup(token, { debug:window.softphone_options.debug_twilio })
+      Twilio.Device.setup(token, { debug:window.softphone_options.debug_twilio, closeProtection:true })
 
       Twilio.Device.ready (device) ->
         jQuery("#softphone #log").text("ready")
@@ -22,17 +22,25 @@ jQuery.ajax
 
       Twilio.Device.connect (conn) ->
         jQuery("#softphone #log").text("successfully established call")
+        toggleConnected(true)
+        console.log('Twilio.Device.connect')
 
       Twilio.Device.disconnect (conn) ->
         jQuery("#softphone #log").text("call ended")
+        toggleConnected(false)
 
       Twilio.Device.incoming (conn) ->
         jQuery("#softphone #log").text("incoming from " + conn.parameters.From)
-        #accept the incoming connection and start two-way audio
-        conn.accept()
+        jQuery("#softphone #outbound-number").val(conn.parameters.From)
+        toggleWidget(true)
+        if confirm('Accept incoming call from ' + conn.parameters.From + '?')
+          conn.accept()
+          toggleConnected(true)
+        else
+          conn.ignore()
 
       jQuery('#softphone #call').click ->
-        connect_params = {"PhoneNumber": jQuery("#softphone #outbound-number").val()}
+        connect_params = {"To": jQuery("#softphone #outbound-number").val()}
         Twilio.Device.connect(connect_params)
 
       jQuery('#softphone #hangup').click ->
@@ -52,6 +60,14 @@ jQuery.ajax
           )
         else
           jQuery('#softphone').removeClass('active').animate({right:'-280px'}, 100)
+
+      toggleConnected = (status) ->
+        if status
+          jQuery('#softphone #call').attr("disabled", true)
+          jQuery('#softphone #hangup').removeAttr("disabled")
+        else
+          jQuery('#softphone #call').removeAttr("disabled")
+          jQuery('#softphone #hangup').attr("disabled", true)
 
       # link all phone numbers
       if window.softphone_options.number_regex
