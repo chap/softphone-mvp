@@ -26,7 +26,7 @@ post '/widget.html' do
 end
 
 post '/voice' do
-  inbound   = (params[:direction] == 'inbound')
+  inbound   = (params[:Direction] == 'inbound')
   to        = CGI::escapeHTML(params[:To] || ENV['TWILIO_CLIENT_ID'])
   to_number = (/^[\d\+\-\(\) ]+$/.match(to))
   from      = (inbound ? params[:From] : ENV['OUTGOING_NUMBER'])
