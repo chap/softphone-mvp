@@ -36,7 +36,7 @@ jQuery.ajax
           conn.accept()
           toggleConnected(true)
         else
-          conn.ignore()
+          conn.reject()
 
       jQuery('#softphone #call').click ->
         connect_params = {"To": jQuery("#softphone #outbound-number").val()}
