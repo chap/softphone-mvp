@@ -33,7 +33,7 @@ post '/voice' do
   from  = ENV['OUTGOING_NUMBER']              if from.include?('client')
 
   response = Twilio::TwiML::Response.new do |r|
-    r.Dial :callerId => from do |d|
+    r.Dial :callerId => from, :record => 'record-from-answer' do |d|
       to.include?('client') ? d.Client(to.gsub('client:','')) : d.Number(to)
     end
   end
